@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense - Finance Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">➕ Add New Expense</h3>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" class="needs-validation">
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">💰 Amount (₹)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   placeholder="Enter amount" required min="0" step="0.01">
+                            <small class="text-muted">e.g., 500, 1200.50</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">📝 Description</label>
+                            <input type="text" class="form-control" id="description" name="description" 
+                                   placeholder="e.g., Pizza at Dominos, Petrol fill-up" required>
+                            <small class="text-muted">This helps auto-categorize your expense</small>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">🏷️ Category (Optional - Auto-filled)</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">-- Let AI auto-categorize --</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat }}">{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Leave empty to auto-categorize based on description</small>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="mb-3">
+                            <label for="date" class="form-label">📅 Date</label>
+                            <input type="date" class="form-control" id="date" name="date" 
+                                   value="{{ now.strftime('%Y-%m-%d') if now else '' }}">
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                            <a href="{{ url_for('expenses') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Expense</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+                    <h5>💡 Quick Tips:</h5>
+                    <ul class="small">
+                        <li>Be specific in the description (e.g., "Uber to office" not just "taxi")</li>
+                        <li>AI will auto-categorize if you leave category empty</li>
+                        <li>You can edit or delete expenses later</li>
+                        <li>Track daily for better insights</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set today's date as default
+    document.getElementById('date').valueAsDate = new Date();
+    
+    // Auto-categorize on description input
+    document.getElementById('description').addEventListener('change', function() {
+        const description = this.value.toLowerCase();
+        const categoryMap = {
+            'pizza': 'Entertainment',
+            'movie': 'Entertainment',
+            'uber': 'Transport',
+            'taxi': 'Transport',
+            'petrol': 'Transport',
+            'fuel': 'Transport',
+            'grocery': 'Groceries',
+            'milk': 'Groceries',
+            'doctor': 'Healthcare',
+            'hospital': 'Healthcare',
+            'medicine': 'Healthcare',
+            'restaurant': 'Entertainment',
+            'cafe': 'Entertainment',
+            'gym': 'Fitness',
+            'netflix': 'Entertainment',
+            'spotify': 'Entertainment'
+        };
+        
+        for (const [keyword, category] of Object.entries(categoryMap)) {
+            if (description.includes(keyword)) {
+                document.getElementById('category').value = category;
+                break;
+            }
+        }
+    });
+</script>
+{% endblock %}

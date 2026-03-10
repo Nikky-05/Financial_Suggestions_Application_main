@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Finance Optimizer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>📊 Dashboard</h2>
+            <p class="text-muted">Welcome back! Start managing your finances.</p>
+        </div>
+    </div>
+
+    <!-- Quick Action Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-lg border-0 h-100 text-center" style="cursor: pointer; transition: transform 0.3s;" 
+                 onmouseover="this.style.transform='translateY(-5px)'" 
+                 onmouseout="this.style.transform='translateY(0)'"
+                 onclick="window.location.href='{{ url_for('expenses') }}'">
+                <div class="card-body py-4">
+                    <h3>📋</h3>
+                    <h5 class="card-title">Track Expenses</h5>
+                    <p class="card-text text-muted">View and manage your spending</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-lg border-0 h-100 text-center" style="cursor: pointer; transition: transform 0.3s;" 
+                 onmouseover="this.style.transform='translateY(-5px)'" 
+                 onmouseout="this.style.transform='translateY(0)'"
+                 onclick="window.location.href='{{ url_for('add_expense') }}'">
+                <div class="card-body py-4">
+                    <h3>➕</h3>
+                    <h5 class="card-title">Add Expense</h5>
+                    <p class="card-text text-muted">Record a new expense</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-lg border-0 h-100 text-center" style="cursor: pointer; transition: transform 0.3s;" 
+                 onmouseover="this.style.transform='translateY(-5px)'" 
+                 onmouseout="this.style.transform='translateY(0)'"
+                 onclick="window.location.href='{{ url_for('add_income') }}'">
+                <div class="card-body py-4">
+                    <h3>💵</h3>
+                    <h5 class="card-title">Add Income</h5>
+                    <p class="card-text text-muted">Record your income</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-lg border-0 h-100 text-center" style="cursor: pointer; transition: transform 0.3s;" 
+                 onmouseover="this.style.transform='translateY(-5px)'" 
+                 onmouseout="this.style.transform='translateY(0)'"
+                 onclick="window.location.href='{{ url_for('financial_insights') }}'">
+                <div class="card-body py-4">
+                    <h3>🤖</h3>
+                    <h5 class="card-title">AI Insights</h5>
+                    <p class="card-text text-muted">Get smart recommendations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3>✨ Features</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🎯 Expense Tracking</h5>
+                    <p class="card-text">Track daily expenses and automatically categorize them using AI.</p>
+                    <a href="{{ url_for('expenses') }}" class="btn btn-sm btn-primary">View Expenses</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📊 Smart Analytics</h5>
+                    <p class="card-text">Get insights into your spending patterns and financial health.</p>
+                    <a href="{{ url_for('financial_insights') }}" class="btn btn-sm btn-info">View Insights</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">💡 AI Recommendations</h5>
+                    <p class="card-text">Personalized money-saving tips based on your spending habits.</p>
+                    <a href="{{ url_for('financial_insights') }}" class="btn btn-sm btn-success">Get Tips</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">💰 Budget Planning</h5>
+                    <p class="card-text">Set budgets for different expense categories and track your progress.</p>
+                    <button class="btn btn-sm btn-outline-primary" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Charts & Reports</h5>
+                    <p class="card-text">Visualize your spending with beautiful charts and detailed reports.</p>
+                    <a href="{{ url_for('financial_insights') }}" class="btn btn-sm btn-outline-info">View Charts</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🔔 Smart Alerts</h5>
+                    <p class="card-text">Get notified when you approach your budget limits or unusual spending is detected.</p>
+                    <button class="btn btn-sm btn-outline-warning" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Data Section (if available) -->
+    {% if data %}
+    <div class="row mt-5 mb-4">
+        <div class="col-md-12">
+            <h3>📊 Market Overview</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        {% if data.get('indices') %}
+            {% for index in data.indices[:3] %}
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ index.name }}</h6>
+                        <h4>{{ index.value }}</h4>
+                        <p class="text-{{ 'success' if index.change > 0 else 'danger' }}">
+                            {{ '📈' if index.change > 0 else '📉' }} 
+                            {{ index.change }}%
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Getting Started Guide -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow-lg border-0 bg-light">
+                <div class="card-body p-4">
+                    <h4>🚀 Getting Started</h4>
+                    <ol>
+                        <li><strong>Add Your Income:</strong> Start by recording your monthly income sources</li>
+                        <li><strong>Track Expenses:</strong> Add your daily expenses - AI will categorize them automatically</li>
+                        <li><strong>View Insights:</strong> Check AI-powered analysis and get personalized recommendations</li>
+                        <li><strong>Set Budgets:</strong> Create monthly budgets for each spending category</li>
+                        <li><strong>Monitor Progress:</strong> Check your dashboard regularly to track your financial health</li>
+                    </ol>
+                    <p class="mt-3 mb-0">
+                        <a href="{{ url_for('add_income') }}" class="btn btn-primary">💵 Start with Income</a>
+                        <a href="{{ url_for('add_expense') }}" class="btn btn-outline-primary">➕ Add Expense</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}

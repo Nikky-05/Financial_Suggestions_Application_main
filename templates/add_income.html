@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Add Income - Finance Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">💵 Add Income</h3>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" class="needs-validation">
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">💰 Amount (₹)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   placeholder="Enter amount" required min="0" step="0.01">
+                            <small class="text-muted">e.g., 50000, 75000.50</small>
+                        </div>
+
+                        <!-- Source -->
+                        <div class="mb-3">
+                            <label for="source" class="form-label">📌 Income Source</label>
+                            <input type="text" class="form-control" id="source" name="source" 
+                                   placeholder="e.g., Salary, Freelance, Bonus" value="Salary">
+                            <small class="text-muted">Where did this income come from?</small>
+                        </div>
+
+                        <!-- Frequency -->
+                        <div class="mb-3">
+                            <label for="frequency" class="form-label">🔄 Frequency</label>
+                            <select class="form-select" id="frequency" name="frequency">
+                                <option value="Monthly" selected>Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Yearly">Yearly</option>
+                                <option value="One-time">One-time</option>
+                            </select>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="mb-3">
+                            <label for="date" class="form-label">📅 Date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                            <a href="{{ url_for('expenses') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Save Income</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+                    <h5>💡 Common Income Sources:</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="small">
+                                <li>💼 Salary</li>
+                                <li>👨‍💼 Freelance</li>
+                                <li>🎁 Bonus</li>
+                                <li>📚 Tutoring</li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="small">
+                                <li>💰 Investment Returns</li>
+                                <li>🏠 Rental Income</li>
+                                <li>📦 Side Business</li>
+                                <li>🎰 Others</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set today's date as default
+    document.getElementById('date').valueAsDate = new Date();
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+/* Enhanced Real-Time Dashboard Styles */
+
+/* Price change indicators */
+.price-indicator {
+    display: inline-block;
+    font-size: 1.2rem;
+    animation: bounce 0.5s ease-in-out;
+    margin-left: 5px;
+}
+
+.price-indicator.up {
+    color: #10b981;
+}
+
+.price-indicator.down {
+    color: #ef4444;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Row background animations for price changes */
+tr.price-up {
+    background-color: #d1fae5 !important;
+    transition: background-color 1s ease-out;
+}
+
+tr.price-down {
+    background-color: #fee2e2 !important;
+    transition: background-color 1s ease-out;
+}
+
+.value-up {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.value-down {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+/* Animated arrows */
+.arrow-up {
+    display: inline-block;
+    animation: arrowUp 0.6s ease-in-out infinite;
+    color: #10b981;
+    font-weight: bold;
+}
+
+.arrow-down {
+    display: inline-block;
+    animation: arrowDown 0.6s ease-in-out infinite;
+    color: #ef4444;
+    font-weight: bold;
+}
+
+@keyframes arrowUp {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes arrowDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+}
+
+/* Pulse animation for updating elements */
+.updating {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; background-color: #fef3c7; }
+}

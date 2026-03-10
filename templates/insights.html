@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}AI Financial Insights - Finance Optimizer{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>🤖 AI Financial Insights</h2>
+            <p class="text-muted">Personalized recommendations based on your spending patterns</p>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% else %}
+
+    <!-- Main Insight -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-body bg-gradient p-4">
+                    <h4>📈 Monthly Insight</h4>
+                    <h5 class="text-primary">{{ insights.insight }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-success">💷 Income</h6>
+                    <h3 class="card-text">{{ format_currency(insights.stats.total_income) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-danger">💸 Expenses</h6>
+                    <h3 class="card-text">{{ format_currency(insights.stats.total_expenses) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-info">💰 Savings</h6>
+                    <h3 class="card-text">{{ format_currency(insights.stats.balance) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-warning">📊 Save Rate</h6>
+                    <h3 class="card-text">{{ insights.stats.savings_rate }}%</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">💡 Smart Savings Tips from AI</h5>
+                </div>
+                <div class="card-body">
+                    {% if insights.recommendations %}
+                    <div class="list-group list-group-flush">
+                        {% for recommendation in insights.recommendations %}
+                        <div class="list-group-item">
+                            <p class="mb-0">{{ recommendation }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No recommendations available yet. Add more expenses to get AI insights.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spending Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">🎯 Category Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📊 Top Spending Categories</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>🏷️ Category</th>
+                                <th>💸 Amount</th>
+                                <th>📈 % of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if insights.stats.category_breakdown %}
+                                {% for cat, amount in insights.stats.category_breakdown.items() %}
+                                <tr>
+                                    <td><strong>{{ cat }}</strong></td>
+                                    <td>{{ format_currency(amount) }}</td>
+                                    <td>
+                                        {% set percentage = (amount / insights.stats.total_expenses * 100) if insights.stats.total_expenses > 0 else 0 %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ percentage }}%">
+                                                {{ "%.1f" | format(percentage) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No spending data yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📈 Spending Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>💲 Average Expense:</strong> {{ format_currency(insights.stats.average_expense) }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>🔢 Total Expenses:</strong> {{ insights.stats.expense_count }} transactions</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>✅ Status:</strong> 
+                                {% if insights.stats.savings_rate >= 30 %}
+                                    <span class="badge bg-success">Excellent Saver</span>
+                                {% elif insights.stats.savings_rate >= 20 %}
+                                    <span class="badge bg-info">Good Saver</span>
+                                {% elif insights.stats.savings_rate >= 10 %}
+                                    <span class="badge bg-warning">Moderate Saver</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Needs Improvement</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{{ url_for('add_expense') }}" class="btn btn-primary">➕ Add Expense</a>
+            <a href="{{ url_for('expenses') }}" class="btn btn-secondary">📋 View All Expenses</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Create category breakdown chart
+fetch('/api/expense-stats')
+    .then(resp => resp.json())
+    .then(data => {
+        const categories = Object.keys(data.category_breakdown);
+        const amounts = Object.values(data.category_breakdown);
+        
+        if (categories.length > 0) {
+            const ctx = document.getElementById('categoryChart');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
+                            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    })
+    .catch(err => console.log('Error loading chart:', err));
+</script>
+{% endblock %}
