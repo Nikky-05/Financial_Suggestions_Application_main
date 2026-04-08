@@ -546,29 +546,27 @@ def expenses():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Get expenses for current month
-        today = datetime.now()
-        month_start = today.replace(day=1)
-        
+        # Get all-time expenses (no date filter)
         cursor.execute('''
             SELECT * FROM expenses 
-            WHERE user_id = ? AND date >= ?
+            WHERE user_id = ?
             ORDER BY date DESC
             LIMIT 100
-        ''', (user_id, month_start))
+        ''', (user_id,))
         
         expenses_list = [dict(row) for row in cursor.fetchall()]
         
-        # Get income
+        # Get all-time income (no date filter)
         cursor.execute('''
             SELECT * FROM income 
-            WHERE user_id = ? AND date >= ?
+            WHERE user_id = ?
             ORDER BY date DESC
-        ''', (user_id, month_start))
+        ''', (user_id,))
         income_list = [dict(row) for row in cursor.fetchall()]
         
         conn.close()
         
+        # Calculate totals from ALL records
         total_income = sum([i['amount'] for i in income_list])
         total_expenses = sum([e['amount'] for e in expenses_list])
         balance = total_income - total_expenses
@@ -650,6 +648,28 @@ def add_income():
         logger.error(f"Add income error: {e}")
         return render_template('add_income.html', error=str(e))
 
+@app.route('/delete-all-income', methods=['POST'])
+@login_required
+def delete_all_income():
+    """Delete all income records for current user"""
+    try:
+        user_id = session.get('user_id')
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Delete all income records
+        cursor.execute('DELETE FROM income WHERE user_id = ?', (user_id,))
+        conn.commit()
+        
+        deleted_count = cursor.rowcount
+        conn.close()
+        
+        logger.info(f"✅ Deleted {deleted_count} income records for user {user_id}")
+        return jsonify({'success': True, 'message': f'Deleted {deleted_count} income records'})
+    except Exception as e:
+        logger.error(f"Delete all income error: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
 @app.route('/financial-insights')
 @login_required
 def financial_insights():
@@ -675,9 +695,23 @@ def api_expense_stats():
     try:
         user_id = session.get('user_id')
         conn = get_db_connection()
+        cursor = conn.cursor()
         
         insights = get_expense_insights(user_id, conn)
         stats = insights['stats']
+        
+        # Calculate income breakdown by source
+        cursor.execute('''
+            SELECT source, SUM(amount) as total 
+            FROM income 
+            WHERE user_id = ? 
+            GROUP BY source 
+            ORDER BY total DESC
+        ''', (user_id,))
+        
+        income_breakdown = {}
+        for row in cursor.fetchall():
+            income_breakdown[row['source']] = row['total']
         
         # Format for charts
         chart_data = {
@@ -686,6 +720,7 @@ def api_expense_stats():
             'balance': stats['balance'],
             'savings_rate': stats['savings_rate'],
             'category_breakdown': stats['category_breakdown'],
+            'income_breakdown': income_breakdown,
             'top_categories': stats['top_categories'],
             'average_expense': stats['average_expense']
         }

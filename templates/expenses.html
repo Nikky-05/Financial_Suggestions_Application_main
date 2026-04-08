@@ -25,6 +25,9 @@
                 <div class="card-body">
                     <h6 class="card-title text-success">💷 Total Income</h6>
                     <h4 class="card-text">{{ format_currency(total_income) }}</h4>
+                    {% if total_income > 0 %}
+                    <button class="btn btn-sm btn-danger mt-2" onclick="deleteAllIncome()">🗑️ Clear All Income</button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -149,7 +152,16 @@
 
             <div class="card shadow mt-3">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">📊 Spending Breakdown</h5>
+                    <h5 class="mb-0">� Income vs Expenses Ratio</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card shadow mt-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">📊 Expense Category Breakdown</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="categoryChart"></canvas>
@@ -176,10 +188,65 @@ function deleteExpense(expenseId) {
     }
 }
 
+function deleteAllIncome() {
+    if (confirm('⚠️ This will DELETE ALL income records! Are you sure?')) {
+        fetch('/delete-all-income', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ All income records deleted successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to delete income'));
+            }
+        });
+    }
+}
+
 // Load chart data
 fetch('/api/expense-stats')
     .then(resp => resp.json())
     .then(data => {
+        // 1. Income vs Expenses Ratio Chart
+        const incomeExpenseCtx = document.getElementById('incomeExpenseChart');
+        if (incomeExpenseCtx) {
+            new Chart(incomeExpenseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['💷 Total Income', '💸 Total Expenses'],
+                    datasets: [{
+                        data: [data.total_income, data.total_expenses],
+                        backgroundColor: ['#32CD32', '#FF6384']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = data.total_income + data.total_expenses;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ₹' + value.toLocaleString('en-IN') + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Expense Category Breakdown Chart
         const categories = Object.keys(data.category_breakdown);
         const amounts = Object.values(data.category_breakdown);
         
